@@ -4,9 +4,8 @@ import { getEstabelecimentoByProprietarioId } from '@/lib/estabelecimento'
 import ArtistHome from './components/ArtistHome'
 import ProprietarioHome from './components/ProprietarioHome'
 
-// This is a placeholder function. In a real app, you'd get the user ID from the session.
 async function getCurrentUserId() {
-  return 1; // Placeholder user ID
+  return process.env.USER_ID;
 }
 
 export default async function Home() {

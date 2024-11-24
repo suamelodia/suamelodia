@@ -3,23 +3,45 @@ import './globals.css'
 import Link from 'next/link'
 import Image from 'next/image'
 import { CalendarDays, Users, Music, Star, FileText, Home } from 'lucide-react'
+import { getArtistaByUserId } from '@/lib/artista'
+import { getEstabelecimentoByProprietarioId } from '@/lib/estabelecimento'
+import { getUserById } from '@/lib/usuario'
 
 const inter = Inter({ subsets: ['latin'] })
 
-const navItems = [
+async function getCurrentUserId() {
+  return process.env.USER_ID;
+}
+
+const artistNavItems = [
   { name: 'Home', href: '/', icon: Home },
-  { name: 'Events', href: '/events', icon: CalendarDays },
-  { name: 'Artists', href: '/artists/search', icon: Music },
-  { name: 'Browse', href: '/events/browse', icon: Users },
+  { name: 'Browse Events', href: '/events/browse', icon: CalendarDays },
   { name: 'Reviews', href: '/reviews', icon: Star },
   { name: 'Contracts', href: '/contracts', icon: FileText },
 ]
+
+const proprietarioNavItems = [
+  { name: 'Home', href: '/', icon: Home },
+  { name: 'Manage Events', href: '/events', icon: CalendarDays },
+  { name: 'Artists', href: '/artists', icon: Music },
+  { name: 'Reviews', href: '/reviews', icon: Star },
+  { name: 'Contracts', href: '/contracts', icon: FileText },
+]
+
+const userId = await getCurrentUserId();
+const user = await getUserById(userId);
+const artist = await getArtistaByUserId(userId);
+const establishment = await getEstabelecimentoByProprietarioId(userId);
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  console.log('artist', artist)
+  console.log('establishment', establishment)
+  const navItems = artist ? artistNavItems : proprietarioNavItems
+
   return (
     <html lang="en">
       <body className={inter.className}>
