@@ -4,29 +4,27 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { query } from '@/lib/dbUtils'
 
-async function searchContracts(searchTerm: string) {
+async function searchReviews(searchTerm: string) {
   const sql = `
-    SELECT c.*, e.descricao as evento_descricao, u.nome as artista_nome
-    FROM Contrato c
-    JOIN Evento e ON c.id_evento = e.id_evento
-    JOIN Artista a ON c.id_artista = a.id_artista
+    SELECT a.*, u.nome as usuario_nome
+    FROM Avaliacao a
     JOIN Usuario u ON a.id_usuario = u.id_usuario
-    WHERE e.descricao ILIKE $1 OR u.nome ILIKE $1
+    WHERE u.nome ILIKE $1 OR a.comentario ILIKE $1
   `
   const res = await query(sql, [`%${searchTerm}%`])
   return res.rows
 }
 
-export default async function ContractsPage({ searchParams }: { searchParams: { search: string } }) {
+export default async function ReviewsPage({ searchParams }: { searchParams: { search: string } }) {
   const searchTerm = searchParams.search || ''
-  const contracts = await searchContracts(searchTerm)
+  const reviews = await searchReviews(searchTerm)
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Contracts</h1>
-        <Link href="/contracts/new">
-          <Button>Create New Contract</Button>
+        <h1 className="text-3xl font-bold">Reviews</h1>
+        <Link href="/reviews/new">
+          <Button>Write a Review</Button>
         </Link>
       </div>
       <div className="flex justify-end">
@@ -34,22 +32,22 @@ export default async function ContractsPage({ searchParams }: { searchParams: { 
           <Input 
             type="search" 
             name="search" 
-            placeholder="Search contracts..." 
+            placeholder="Search reviews..." 
             defaultValue={searchTerm}
           />
         </form>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {contracts.map((contract) => (
-          <Card key={contract.id_contrato}>
+        {reviews.map((review) => (
+          <Card key={review.id_avaliacao}>
             <CardHeader>
-              <CardTitle>{contract.evento_descricao}</CardTitle>
+              <CardTitle>{review.usuario_nome}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Artist: {contract.artista_nome}</p>
-              <p>Value: ${contract.valor}</p>
-              <p>Payment Status: {contract.status_pagamento}</p>
-              <Link href={`/contracts/${contract.id_contrato}`}>
+              <p>Rating: {review.nota} / 5</p>
+              <p>Date: {new Date(review.data).toLocaleDateString()}</p>
+              <p>{review.comentario}</p>
+              <Link href={`/reviews/${review.id_avaliacao}`}>
                 <Button className="mt-4">View Details</Button>
               </Link>
             </CardContent>

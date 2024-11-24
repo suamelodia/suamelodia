@@ -1,43 +1,38 @@
-import { Button } from "@/components/ui/button"
+import { getEventoById } from '@/lib/evento'
+import { getEstabelecimentoById } from '@/lib/estabelecimento'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import Link from 'next/link'
 
-export default function EventDetailsScreen() {
+export default async function EventDetailPage({ params }: { params: { id: string } }) {
+  const event = await getEventoById(parseInt(params.id))
+  const establishment = event?.id_estabelecimento ? await getEstabelecimentoById(event.id_estabelecimento) : null
+
+  if (!event) {
+    return <div>Event not found</div>
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Event Details</h2>
-        <div className="space-x-2">
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>{event.descricao}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p><strong>Start Date:</strong> {new Date(event.data_inicio).toLocaleString()}</p>
+          <p><strong>End Date:</strong> {new Date(event.data_termino).toLocaleString()}</p>
+          <p><strong>Type:</strong> {event.tipo}</p>
+          <p><strong>Status:</strong> {event.status}</p>
+          <p><strong>Venue:</strong> {establishment ? establishment.nome : 'Not specified'}</p>
+          <p><strong>Description:</strong> {event.descricao}</p>
+        </CardContent>
+      </Card>
+      <div className="flex justify-end space-x-4">
+        <Link href={`/events/${params.id}/edit`}>
           <Button variant="outline">Edit</Button>
-          <Button variant="outline">Cancel Event</Button>
-          <Button>Mark as Completed</Button>
-        </div>
+        </Link>
+        <Button variant="destructive">Cancel Event</Button>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Event Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p><strong>Name:</strong> Sample Event</p>
-          <p><strong>Description:</strong> This is a sample event description.</p>
-          <p><strong>Date/Time:</strong> 2023-06-15 19:00 - 2023-06-15 23:00</p>
-          <p><strong>Venue:</strong> Sample Venue</p>
-          <p><strong>Type:</strong> Concert</p>
-          <p><strong>Status:</strong> Upcoming</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Participants</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="list-disc pl-5">
-            <li>Artist 1 (Confirmed)</li>
-            <li>Artist 2 (Pending)</li>
-            <li>Band 1 (Confirmed)</li>
-          </ul>
-          <Button className="mt-4">Invite Artist</Button>
-        </CardContent>
-      </Card>
     </div>
   )
 }

@@ -1,51 +1,37 @@
-import { Button } from "@/components/ui/button"
+import { getArtistaById } from '@/lib/artista'
+import { getUserById } from '@/lib/usuario'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import Link from 'next/link'
 
-export default function ArtistProfileScreen() {
+export default async function ArtistDetailPage({ params }: { params: { id: string } }) {
+  const artist = await getArtistaById(parseInt(params.id))
+  const user = artist ? await getUserById(artist.id_usuario) : null
+
+  if (!artist || !user) {
+    return <div>Artist not found</div>
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Artist Profile</h2>
-        <Button>Invite to Event</Button>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>{user.nome}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p><strong>Email:</strong> {user.email}</p>
+          <p><strong>Phone:</strong> {user.telefone || 'Not provided'}</p>
+          <p><strong>Type:</strong> {artist.eh_banda ? 'Band' : 'Solo Artist'}</p>
+          {artist.ano_formacao && <p><strong>Formed in:</strong> {artist.ano_formacao}</p>}
+          <p><strong>Biography:</strong> {artist.biografia || 'No biography provided'}</p>
+        </CardContent>
+      </Card>
+      <div className="flex justify-end space-x-4">
+        <Link href={`/artists/${params.id}/edit`}>
+          <Button variant="outline">Edit</Button>
+        </Link>
+        <Button variant="destructive">Delete</Button>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Artist Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-4">
-            <div className="w-24 h-24 bg-gray-300 rounded-full"></div>
-            <div>
-              <h3 className="text-xl font-semibold">Artist Name</h3>
-              <p>Genre: Rock</p>
-              <p>Year of Formation: 2010</p>
-            </div>
-          </div>
-          <p className="mt-4">Biography: This is a sample artist biography...</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Availability</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {/* Add a calendar component here */}
-          <p>Calendar placeholder</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Ratings and Reviews</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Average Rating: 4.5 stars</p>
-          {/* Add a list of reviews here */}
-          <ul className="mt-2">
-            <li>Great performance! - 5 stars</li>
-            <li>Good energy on stage - 4 stars</li>
-          </ul>
-        </CardContent>
-      </Card>
     </div>
   )
 }

@@ -33,7 +33,7 @@ export default function RootLayout({
                     alt="Sua Melodia"
                     width={120}
                     height={40}
-                    className="h-12 w-auto"
+                    className="h-8 w-auto"
                   />
                 </Link>
                 <nav>

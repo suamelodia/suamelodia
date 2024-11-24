@@ -1,40 +1,40 @@
-import { Button } from "@/components/ui/button"
+import { getContratoById } from '@/lib/contrato'
+import { getEventoById } from '@/lib/evento'
+import { getArtistaById } from '@/lib/artista'
+import { getUserById } from '@/lib/usuario'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import Link from 'next/link'
 
-export default function ContractDetailsScreen() {
+export default async function ContractDetailPage({ params }: { params: { id: string } }) {
+  const contract = await getContratoById(parseInt(params.id))
+  const event = contract ? await getEventoById(contract.id_evento) : null
+  const artist = contract ? await getArtistaById(contract.id_artista) : null
+  const user = artist ? await getUserById(artist.id_usuario) : null
+
+  if (!contract || !event || !artist || !user) {
+    return <div>Contract not found</div>
+  }
+
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Contract Details</h2>
+    <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Contract Information</CardTitle>
+          <CardTitle>Contract Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <p><strong>Event Name:</strong> Sample Event</p>
-          <p><strong>Date:</strong> 2023-06-15</p>
-          <p><strong>Payment Amount:</strong> $1000</p>
-          <p><strong>Status:</strong> Pending</p>
+          <p><strong>Event:</strong> {event.descricao}</p>
+          <p><strong>Artist:</strong> {user.nome}</p>
+          <p><strong>Value:</strong> ${contract.valor}</p>
+          <p><strong>Payment Status:</strong> {contract.status_pagamento}</p>
+          <p><strong>Conditions:</strong> {contract.condicoes || 'No specific conditions'}</p>
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Terms and Conditions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>These are the terms and conditions of the contract...</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Payment Status</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Current Status: Pending</p>
-        </CardContent>
-      </Card>
-      <div className="flex justify-end space-x-2">
-        <Button variant="outline">Cancel Contract</Button>
-        <Button>Accept/Sign</Button>
+      <div className="flex justify-end space-x-4">
+        <Link href={`/contracts/${params.id}/edit`}>
+          <Button variant="outline">Edit</Button>
+        </Link>
+        <Button variant="destructive">Delete</Button>
       </div>
     </div>
   )
