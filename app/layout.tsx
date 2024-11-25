@@ -2,7 +2,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Link from 'next/link'
 import Image from 'next/image'
-import { CalendarDays, Users, Music, Star, FileText, Home } from 'lucide-react'
+import { CalendarDays, Users, Music, Star, FileText, Home, ClipboardEditIcon } from 'lucide-react'
 import { getArtistaByUserId } from '@/lib/artista'
 import { getEstabelecimentoByProprietarioId } from '@/lib/estabelecimento'
 import { getUserById } from '@/lib/usuario'
@@ -13,11 +13,17 @@ async function getCurrentUserId() {
   return process.env.USER_ID;
 }
 
+const userId = await getCurrentUserId();
+const user = await getUserById(userId);
+const artist = await getArtistaByUserId(userId);
+const establishment = await getEstabelecimentoByProprietarioId(userId);
+
 const artistNavItems = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Browse Events', href: '/events/browse', icon: CalendarDays },
   { name: 'Reviews', href: '/reviews', icon: Star },
   { name: 'Contracts', href: '/contracts', icon: FileText },
+  { name: 'Aplicações', href: `/applies/${userId}`, icon: ClipboardEditIcon },
 ]
 
 const proprietarioNavItems = [
@@ -27,11 +33,6 @@ const proprietarioNavItems = [
   { name: 'Reviews', href: '/reviews', icon: Star },
   { name: 'Contracts', href: '/contracts', icon: FileText },
 ]
-
-const userId = await getCurrentUserId();
-const user = await getUserById(userId);
-const artist = await getArtistaByUserId(userId);
-const establishment = await getEstabelecimentoByProprietarioId(userId);
 
 export default function RootLayout({
   children,
@@ -53,8 +54,8 @@ export default function RootLayout({
                   <Image
                     src="/logo.png"
                     alt="Sua Melodia"
-                    width={120}
-                    height={40}
+                    width={3728}
+                    height={1072}
                     className="h-8 w-auto"
                   />
                 </Link>
