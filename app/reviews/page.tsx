@@ -2,22 +2,41 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { query } from '@/lib/dbUtils'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { StarRating } from '@/app/components/StarRating'
+import { getSentReviews, getReceivedReviews } from '@/lib/review'
 
-async function searchReviews(searchTerm: string) {
-  const sql = `
-    SELECT a.*, u.nome as usuario_nome
-    FROM Avaliacao a
-    JOIN Usuario u ON a.id_usuario = u.id_usuario
-    WHERE u.nome ILIKE $1 OR a.comentario ILIKE $1
-  `
-  const res = await query(sql, [`%${searchTerm}%`])
-  return res.rows
+async function getCurrentUserId() {
+  return parseInt(process.env.USER_ID || '1');
 }
 
 export default async function ReviewsPage({ searchParams }: { searchParams: { search: string } }) {
   const searchTerm = searchParams.search || ''
-  const reviews = await searchReviews(searchTerm)
+  const currentUserId = await getCurrentUserId()
+  const sentReviews = await getSentReviews(currentUserId, searchTerm)
+  const receivedReviews = await getReceivedReviews(currentUserId, searchTerm)
+
+  const ReviewList = ({ reviews, type }: { reviews: any[], type: string }) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {reviews.map((review) => (
+        <Card key={review.id_avaliacao} className="hover:shadow-lg transition-shadow duration-300">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>{type === 'sent' ? review.receiver_name : review.sender_name}</CardTitle>
+              <StarRating rating={review.nota} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 mb-2">{review.comentario}</p>
+            <p className="text-sm text-gray-500 mb-4">{new Date(review.data).toLocaleDateString()}</p>
+            <Link href={`/reviews/${review.id_avaliacao}`}>
+              <Button variant="outline" size="sm" className="w-full">View Details</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  )
 
   return (
     <div className="space-y-6">
@@ -28,32 +47,27 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { se
         </Link>
       </div>
       <div className="flex justify-end">
-        <form className="w-1/3">
-          <Input 
-            type="search" 
-            name="search" 
-            placeholder="Search reviews..." 
+        <form className="w-full md:w-1/3">
+          <Input
+            type="search"
+            name="search"
+            placeholder="Search reviews..."
             defaultValue={searchTerm}
           />
         </form>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {reviews.map((review) => (
-          <Card key={review.id_avaliacao}>
-            <CardHeader>
-              <CardTitle>{review.usuario_nome}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Rating: {review.nota} / 5</p>
-              <p>Date: {new Date(review.data).toLocaleDateString()}</p>
-              <p>{review.comentario}</p>
-              <Link href={`/reviews/${review.id_avaliacao}`}>
-                <Button className="mt-4">View Details</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <Tabs defaultValue="sent" className="w-full">
+        <TabsList className="w-full justify-start">
+          <TabsTrigger value="sent" className="flex-1">Sent Reviews</TabsTrigger>
+          <TabsTrigger value="received" className="flex-1">Received Reviews</TabsTrigger>
+        </TabsList>
+        <TabsContent value="sent" className="mt-6">
+          <ReviewList reviews={sentReviews} type="sent" />
+        </TabsContent>
+        <TabsContent value="received" className="mt-6">
+          <ReviewList reviews={receivedReviews} type="received" />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
