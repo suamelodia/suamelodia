@@ -2,7 +2,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Link from 'next/link'
 import Image from 'next/image'
-import { CalendarDays, Users, Music, Star, FileText, Home, ClipboardEditIcon } from 'lucide-react'
+import { CalendarDays, Users, Music, Star, FileText, Home, ClipboardEditIcon, Building } from 'lucide-react'
 import { getArtistaByUserId } from '@/lib/artista'
 import { getEstabelecimentoByProprietarioId } from '@/lib/estabelecimento'
 import { getUserById } from '@/lib/usuario'
@@ -29,6 +29,7 @@ const artistNavItems = artist && [
 
 const proprietarioNavItems = proprietario && [
   { name: 'Home', href: '/', icon: Home },
+  { name: 'Manage Establishments', href: '/establishments', icon: Building },
   { name: 'Manage Events', href: '/events', icon: CalendarDays },
   { name: 'Artists', href: '/artists', icon: Music },
   { name: 'Reviews', href: '/reviews', icon: Star },
@@ -73,9 +74,9 @@ export default async function RootLayout({
                   <Image
                     src="/logo.png"
                     alt="Sua Melodia"
-                    width={3728}
+                    width={3428}
                     height={1072}
-                    className="h-8 w-auto"
+                    className="h-10 w-auto"
                   />
                 </Link>
                 <nav>

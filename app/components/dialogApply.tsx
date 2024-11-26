@@ -87,7 +87,7 @@ export function DialogApply({ userId, artista, proprietario, contract, id_evento
               onChange={(e) => handleInputChange(contract.id_contrato, e.target.value)}
             />
           </div>
-          <Button onClick={() => handleApply(contract)}>Aplicar</Button>
+          <Button onClick={() => handleApply(contract)}>Apply</Button>
         </div>
         :
         <div className="p-4 rounded-md border-2 space-y-4">

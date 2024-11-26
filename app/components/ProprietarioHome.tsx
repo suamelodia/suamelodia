@@ -1,6 +1,12 @@
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CalendarDays, Star, Music, FileText } from 'lucide-react'
+import { CalendarDays, Star, Music, FileText, Building } from 'lucide-react'
+
+async function getCurrentUserId() {
+    return Number(process.env.USER_ID)
+}
+
+const userId = await getCurrentUserId();
 
 export default function ProprietarioHome() {
     const sections = [
@@ -9,6 +15,12 @@ export default function ProprietarioHome() {
             icon: CalendarDays,
             href: '/events',
             description: 'Create and manage your events'
+        },
+        {
+            title: 'Manage Establishments',
+            icon: Building,
+            href: '/establishments',
+            description: 'Add and edit your venues and locations'
         },
         {
             title: 'Reviews',
@@ -25,7 +37,7 @@ export default function ProprietarioHome() {
         {
             title: 'Contracts',
             icon: FileText,
-            href: '/contracts',
+            href: `/contracts/${userId}`,
             description: 'Manage event contracts'
         },
     ]
@@ -33,7 +45,7 @@ export default function ProprietarioHome() {
     return (
         <div className="space-y-8 py-8">
             <div className="text-center space-y-4">
-                <h1 className="text-4xl font-bold text-gray-900">Welcome to Sua Melodia, Proprietário!</h1>
+                <h1 className="text-4xl font-bold text-gray-900">Welcome to Sua Melodia, Proprietor!</h1>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                     Manage your events, artists, reviews, and contracts all in one place.
                 </p>

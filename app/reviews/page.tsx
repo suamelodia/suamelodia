@@ -43,7 +43,6 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { se
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Reviews</h1>
         <Link href="/reviews/new">
-          <Button>Write a Review</Button>
         </Link>
       </div>
       <div className="flex justify-end">
