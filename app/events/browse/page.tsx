@@ -9,7 +9,18 @@ import { getContratosAvailableByEvento } from "@/lib/contrato"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { DialogApply } from "@/app/components/dialogApply"
 
-async function searchEvents(searchTerm: string) {
+// Definir o tipo do Evento
+type Event = {
+  id_evento: number
+  descricao: string
+  data_inicio: string
+  data_termino: string
+  tipo: string
+  status: string
+  estabelecimento_nome: string | null
+}
+
+async function searchEvents(searchTerm: string): Promise<Event[]> {
   const sql = `
     SELECT e.*, es.nome as estabelecimento_nome
     FROM Evento e
@@ -113,4 +124,3 @@ export default async function BrowseEventsPage({ searchParams }: { searchParams:
     </div>
   )
 }
-

@@ -10,7 +10,16 @@ import { getContratosAvailableByEventoAndArtist } from '@/lib/contrato'
 import { getEventosByProprietarioId } from '@/lib/evento'
 import { DialogApply } from '../components/dialogApply'
 
-async function searchArtists(searchTerm: string) {
+// Defina o tipo dos artistas
+type Artist = {
+  id_artista: number
+  nome_artista: string
+  genero: string | null
+  eh_banda: boolean
+  ano_formacao: number | null
+}
+
+async function searchArtists(searchTerm: string): Promise<Artist[]> {
   const sql = `
     SELECT a.*, u.nome as nome_artista, gm.nome as genero
     FROM Artista a
@@ -28,7 +37,7 @@ async function getCurrentUserId() {
 
 export default async function ArtistsPage({ searchParams }: { searchParams: { search: string } }) {
   const searchTerm = searchParams.search || ''
-  const artists = await searchArtists(searchTerm)
+  const artists: Artist[] = await searchArtists(searchTerm)
 
   const userId = await getCurrentUserId()
   const proprietario = await getProprietarioByUserId(userId)
@@ -54,7 +63,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: { se
         </form>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {artists.map((artist) => (
+        {artists.map((artist: Artist) => (
           <Card key={artist.id_artista}>
             <CardHeader>
               <CardTitle>{artist.nome_artista}</CardTitle>
@@ -111,4 +120,3 @@ export default async function ArtistsPage({ searchParams }: { searchParams: { se
     </div>
   )
 }
-
