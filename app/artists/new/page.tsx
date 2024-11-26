@@ -6,14 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Select } from "@/components/ui/select"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 
 export default function NewArtistPage() {
   const router = useRouter()
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
-    senha: '',
     telefone: '',
     id_genero: '',
     eh_banda: false,
@@ -21,9 +20,13 @@ export default function NewArtistPage() {
     biografia: ''
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleGenreChange = (value: string) => {
+    setFormData(prev => ({ ...prev, id_genero: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,7 +53,7 @@ export default function NewArtistPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add New Artist</CardTitle>
+        <CardTitle>Create Artist</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -70,22 +73,24 @@ export default function NewArtistPage() {
             required
           />
           <Input
-            name="senha"
-            type="password"
-            placeholder="Password"
-            value={formData.senha}
-            onChange={handleChange}
-            required
-          />
-          <Input
             name="telefone"
             placeholder="Phone"
             value={formData.telefone}
             onChange={handleChange}
           />
-          <Select name="id_genero" value={formData.id_genero} onChange={handleChange}>
-            <option value="">Select Genre</option>
-            {/* Add genre options here */}
+          <Select
+            onValueChange={handleGenreChange} // Utilizado para atualizar o gênero
+            value={formData.id_genero}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select Genre" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">Rock</SelectItem>
+              <SelectItem value="2">Jazz</SelectItem>
+              <SelectItem value="3">Pop</SelectItem>
+              {/* Adicione mais opções conforme necessário */}
+            </SelectContent>
           </Select>
           <div>
             <label>
@@ -117,4 +122,3 @@ export default function NewArtistPage() {
     </Card>
   )
 }
-

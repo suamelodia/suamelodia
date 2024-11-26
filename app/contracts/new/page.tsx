@@ -6,7 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Select } from "@/components/ui/select"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+
+// Definindo os tipos para os dados
+interface Event {
+  id_evento: string;
+  descricao: string;
+}
+
+interface Artist {
+  id_artista: string;
+  nome: string;
+}
 
 export default function NewContractPage() {
   const router = useRouter()
@@ -18,8 +29,8 @@ export default function NewContractPage() {
     id_proprietario: '',
     id_artista: ''
   })
-  const [events, setEvents] = useState([])
-  const [artists, setArtists] = useState([])
+  const [events, setEvents] = useState<Event[]>([]) // Definindo o tipo do estado
+  const [artists, setArtists] = useState<Artist[]>([]) // Definindo o tipo do estado
 
   useEffect(() => {
     // Fetch events and artists for dropdowns
@@ -67,21 +78,29 @@ export default function NewContractPage() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Select name="id_evento" value={formData.id_evento} onChange={handleChange} required>
-            <option value="">Select Event</option>
-            {events.map((event) => (
-              <option key={event.id_evento} value={event.id_evento}>
-                {event.descricao}
-              </option>
-            ))}
+          <Select value={formData.id_evento} onValueChange={(value) => handleChange({ target: { name: 'id_evento', value } } as any)} required>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Event" />
+            </SelectTrigger>
+            <SelectContent>
+              {events.map((event) => (
+                <SelectItem key={event.id_evento} value={event.id_evento}>
+                  {event.descricao}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
-          <Select name="id_artista" value={formData.id_artista} onChange={handleChange} required>
-            <option value="">Select Artist</option>
-            {artists.map((artist) => (
-              <option key={artist.id_artista} value={artist.id_artista}>
-                {artist.nome}
-              </option>
-            ))}
+          <Select value={formData.id_artista} onValueChange={(value) => handleChange({ target: { name: 'id_artista', value } } as any)} required>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Artist" />
+            </SelectTrigger>
+            <SelectContent>
+              {artists.map((artist) => (
+                <SelectItem key={artist.id_artista} value={artist.id_artista}>
+                  {artist.nome}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
           <Input
             name="valor"
@@ -92,11 +111,15 @@ export default function NewContractPage() {
             onChange={handleChange}
             required
           />
-          <Select name="status_pagamento" value={formData.status_pagamento} onChange={handleChange} required>
-            <option value="">Select Payment Status</option>
-            <option value="Pending">Pending</option>
-            <option value="Paid">Paid</option>
-            <option value="Cancelled">Cancelled</option>
+          <Select value={formData.status_pagamento} onValueChange={(value) => handleChange({ target: { name: 'status_pagamento', value } } as any)} required>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Payment Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Pending">Pending</SelectItem>
+              <SelectItem value="Paid">Paid</SelectItem>
+              <SelectItem value="Cancelled">Cancelled</SelectItem>
+            </SelectContent>
           </Select>
           <Textarea
             name="condicoes"
@@ -110,4 +133,3 @@ export default function NewContractPage() {
     </Card>
   )
 }
-

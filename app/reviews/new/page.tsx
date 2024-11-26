@@ -21,6 +21,10 @@ export default function NewReviewPage() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
+  const handleSelectChange = (value: string) => {
+    setFormData(prev => ({ ...prev, nota: value }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
@@ -48,7 +52,8 @@ export default function NewReviewPage() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Select name="nota" value={formData.nota} onChange={handleChange} required>
+          {/* Usando onValueChange em vez de onChange */}
+          <Select name="nota" value={formData.nota} onValueChange={handleSelectChange} required>
             <option value="">Select Rating</option>
             <option value="1">1 Star</option>
             <option value="2">2 Stars</option>
@@ -69,4 +74,3 @@ export default function NewReviewPage() {
     </Card>
   )
 }
-

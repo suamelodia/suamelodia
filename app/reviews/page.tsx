@@ -4,7 +4,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { query } from '@/lib/dbUtils'
 
-async function searchReviews(searchTerm: string) {
+// Definindo a interface para o tipo de Review
+interface Review {
+  id_avaliacao: number
+  usuario_nome: string
+  nota: number
+  comentario: string
+  data: string
+}
+
+async function searchReviews(searchTerm: string): Promise<Review[]> {
   const sql = `
     SELECT a.*, u.nome as usuario_nome
     FROM Avaliacao a
@@ -38,7 +47,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { se
         </form>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {reviews.map((review) => (
+        {reviews.map((review: Review) => (
           <Card key={review.id_avaliacao}>
             <CardHeader>
               <CardTitle>{review.usuario_nome}</CardTitle>
@@ -57,4 +66,3 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { se
     </div>
   )
 }
-
