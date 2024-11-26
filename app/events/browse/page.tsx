@@ -3,12 +3,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { query } from '@/lib/dbUtils'
-import { DialogApply } from "../components/dialogApply"
 import { getUserById } from "@/lib/usuario"
 import { getArtistaByUserId } from "@/lib/artista"
 import { getContratosAvailableByEvento } from "@/lib/contrato"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { title } from "process"
+import { DialogApply } from "@/app/components/dialogApply"
 
 async function searchEvents(searchTerm: string) {
   const sql = `
@@ -95,6 +94,7 @@ export default async function BrowseEventsPage({ searchParams }: { searchParams:
                                 contract={contract}
                                 userId={userId}
                                 artista={artist}
+                                proprietario={null}
                                 id_evento={event.id_evento}
                                 />
                             ))

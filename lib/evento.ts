@@ -5,6 +5,11 @@ export async function getEventosByEstabelecimento(estabelecimentoId: number) {
   return res.rows;
 }
 
+export async function getEventosByProprietarioId(proprietarioId: number) {
+  const res = await query('SELECT ev.* FROM Evento ev JOIN Estabelecimento es ON ev.id_estabelecimento = es.id_estabelecimento WHERE id_proprietario = $1', [proprietarioId]);
+  return res.rows;
+}
+
 export async function createEvento(data: any) {
   return create('Evento', data);
 }

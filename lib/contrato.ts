@@ -10,6 +10,11 @@ export async function getContratosAvailableByEvento(eventoId: number) {
   return res.rows;
 }
 
+export async function getContratosAvailableByEventoAndArtist(eventoId: number, artistaId: number) {
+  const res = await query('SELECT c.* FROM Contrato c WHERE c.id_evento = $1 AND c.id_aplicacao IS NULL AND c.id_contrato NOT IN (SELECT a.id_contrato FROM Aplicacao a WHERE a.id_artista = $2)', [eventoId, artistaId]);
+  return res.rows;
+}
+
 export async function createContrato(data: any) {
   return create('Contrato', data);
 }
