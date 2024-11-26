@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { StarRating } from '@/app/components/StarRating'
 import Link from 'next/link'
+import Image from 'next/image'
 import { MessageSquare, User } from 'lucide-react'
 
 export default async function ArtistDetailPage({ params }: { params: { id: string } }) {
@@ -17,18 +18,29 @@ export default async function ArtistDetailPage({ params }: { params: { id: strin
   }
 
   const averageRating = reviews.length > 0
-    ? reviews.reduce((sum: any, review: any) => sum + review.nota, 0) / reviews.length
+    ? reviews.reduce((sum, review) => sum + review.nota, 0) / reviews.length
     : 0
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-2xl">{user.nome}</CardTitle>
-            <div className="flex items-center space-x-2">
-              <StarRating rating={Math.round(averageRating)} />
-              <span className="text-lg font-semibold">({averageRating.toFixed(1)})</span>
+          <div className="flex items-center space-x-4">
+            <div className="w-24 h-24 overflow-hidden rounded-full">
+              <Image
+                src={user.imagemperfil || '/placeholder.svg'}
+                alt={`${user.nome} avatar`}
+                width={96}
+                height={96}
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <CardTitle className="text-2xl">{user.nome}</CardTitle>
+              <div className="flex items-center space-x-2 mt-2">
+                <StarRating rating={Math.round(averageRating)} />
+                <span className="text-lg font-semibold">({averageRating.toFixed(1)})</span>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -61,17 +73,27 @@ export default async function ArtistDetailPage({ params }: { params: { id: strin
         <CardContent>
           {reviews.length > 0 ? (
             <div className="space-y-6">
-              {reviews.map((review: any) => (
+              {reviews.map((review) => (
                 <div key={review.id_avaliacao} className="border-b border-gray-200 pb-4 last:border-b-0">
                   <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center space-x-2">
-                      <User className="w-6 h-6 text-gray-500" />
-                      <p className="font-semibold">{review.sender_name}</p>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 overflow-hidden rounded-full">
+                        <Image
+                          src={review.sender_image || '/placeholder.svg'}
+                          alt={`${review.sender_name} avatar`}
+                          width={40}
+                          height={40}
+                          className="object-cover"
+                        />
+                      </div>
+                      <div>
+                        <p className="font-semibold">{review.sender_name}</p>
+                        <p className="text-sm text-gray-500">{new Date(review.data).toLocaleDateString()}</p>
+                      </div>
                     </div>
                     <StarRating rating={review.nota} />
                   </div>
-                  <p className="text-gray-600 mb-2">{review.comentario}</p>
-                  <p className="text-sm text-gray-500">{new Date(review.data).toLocaleDateString()}</p>
+                  <p className="text-gray-600 mt-2">{review.comentario}</p>
                 </div>
               ))}
             </div>
@@ -80,13 +102,6 @@ export default async function ArtistDetailPage({ params }: { params: { id: strin
           )}
         </CardContent>
       </Card>
-
-      <div className="flex justify-end space-x-4">
-        <Link href={`/artists/${params.id}/edit`}>
-          <Button variant="outline">Edit Profile</Button>
-        </Link>
-        <Button variant="destructive">Delete Profile</Button>
-      </div>
     </div>
   )
 }

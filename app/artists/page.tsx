@@ -32,9 +32,6 @@ export default async function ArtistsPage({ searchParams }: { searchParams: { se
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Artists</h1>
-        <Link href="/artists/new">
-          <Button>Add New Artist</Button>
-        </Link>
       </div>
       <div className="flex justify-end">
         <form className="w-full md:w-1/3">
