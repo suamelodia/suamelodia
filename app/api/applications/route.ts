@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       id_contrato: body.id_contrato
     }
 
-    
+
     const application = await createAplicacao(applicationData)
     return NextResponse.json(application)
   } catch (error) {
@@ -68,7 +68,18 @@ export async function PUT(request: Request) {
   }
   try {
     const body = await request.json()
-    const application = await updateAplicacao(parseInt(id), body)
+
+    const applicationData = {
+      from_artist: body.from_artist,
+      status_aplicacao: body.status_aplicacao,
+      valorproposta: body.valorProposta,
+      is_accepted: body.is_accepted,
+      comentario_dest: body.comentario_dest || null,
+      id_artista: body.id_artista,
+      id_contrato: body.id_contrato
+    }
+
+    const application = await updateAplicacao(parseInt(id), applicationData)
     return NextResponse.json(application)
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update application' }, { status: 500 })
@@ -78,7 +89,7 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url)
   const id = searchParams.get('id')
-  console.log("ID APPLY: ",id)
+  console.log("ID APPLY: ", id)
   if (!id) {
     return NextResponse.json({ error: 'ID is required' }, { status: 400 })
   }

@@ -35,3 +35,12 @@ export async function getContratoById(id: number) {
   return getById('Contrato', id);
 }
 
+export async function getContratosByProprietarioId(proprietarioId: number) {
+  const res = await query('SELECT * FROM Contrato WHERE id_proprietario = $1', [proprietarioId]);
+  return res.rows;
+}
+
+export async function getContratosByUserId(id: number) {
+  return getById('Contrato', id);
+}
+

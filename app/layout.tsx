@@ -6,6 +6,7 @@ import { CalendarDays, Users, Music, Star, FileText, Home, ClipboardEditIcon } f
 import { getArtistaByUserId } from '@/lib/artista'
 import { getEstabelecimentoByProprietarioId } from '@/lib/estabelecimento'
 import { getUserById } from '@/lib/usuario'
+import { getProprietarioByUserId } from '@/lib/proprietario'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,22 +17,23 @@ async function getCurrentUserId() {
 const userId = await getCurrentUserId();
 const user = await getUserById(userId);
 const artist = await getArtistaByUserId(userId);
+const proprietario = await getProprietarioByUserId(userId);
 const establishment = await getEstabelecimentoByProprietarioId(userId);
 
-const artistNavItems = [
+const artistNavItems = artist && [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Browse Events', href: '/events/browse', icon: CalendarDays },
   { name: 'Reviews', href: '/reviews', icon: Star },
-  { name: 'Contracts', href: '/contracts', icon: FileText },
+  { name: 'Contracts', href: `/contracts/${userId}`, icon: FileText },
   { name: 'Aplicações', href: `/applies/${userId}`, icon: ClipboardEditIcon },
 ]
 
-const proprietarioNavItems = [
+const proprietarioNavItems = proprietario && [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Manage Events', href: '/events', icon: CalendarDays },
   { name: 'Artists', href: '/artists', icon: Music },
   { name: 'Reviews', href: '/reviews', icon: Star },
-  { name: 'Contracts', href: '/contracts', icon: FileText },
+  { name: 'Contracts', href: `/contracts/${userId}`, icon: FileText },
 ]
 
 async function getUserType() {
