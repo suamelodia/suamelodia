@@ -4,30 +4,26 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { query } from '@/lib/dbUtils'
 
-interface Event {
-  id_evento: number;
-  descricao: string;
-  data_inicio: string;
-  data_termino: string;
-  tipo: string;
-  status: string;
-  estabelecimento_nome: string | null;
+async function getCurrentUserId() {
+  return Number(process.env.USER_ID)
 }
 
-async function searchEvents(searchTerm: string): Promise<Event[]> {
+async function searchEvents(searchTerm: string, userId: number) {
   const sql = `
     SELECT e.*, es.nome as estabelecimento_nome
     FROM Evento e
     LEFT JOIN Estabelecimento es ON e.id_estabelecimento = es.id_estabelecimento
-    WHERE e.descricao ILIKE $1 OR es.nome ILIKE $1
+    WHERE (e.descricao ILIKE $1 OR es.nome ILIKE $1)
+    AND es.id_proprietario = $2
   `
-  const res = await query(sql, [`%${searchTerm}%`])
+  const res = await query(sql, [`%${searchTerm}%`, userId])
   return res.rows
 }
 
 export default async function EventsPage({ searchParams }: { searchParams: { search: string } }) {
   const searchTerm = searchParams.search || ''
-  const events = await searchEvents(searchTerm)
+  const userId = await getCurrentUserId()
+  const events = await searchEvents(searchTerm, userId)
 
   return (
     <div className="space-y-6">
@@ -39,16 +35,16 @@ export default async function EventsPage({ searchParams }: { searchParams: { sea
       </div>
       <div className="flex justify-end">
         <form className="w-1/3">
-          <Input 
-            type="search" 
-            name="search" 
-            placeholder="Search events..." 
+          <Input
+            type="search"
+            name="search"
+            placeholder="Search events..."
             defaultValue={searchTerm}
           />
         </form>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.map((event: Event) => (
+        {events.map((event) => (
           <Card key={event.id_evento}>
             <CardHeader>
               <CardTitle>{event.descricao}</CardTitle>

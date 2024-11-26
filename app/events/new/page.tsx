@@ -37,7 +37,7 @@ export default function NewEventPage() {
 
   useEffect(() => {
     const fetchEstablishments = async () => {
-      const res = await fetch('/api/establishments')
+      const res = await fetch('/api/establishments/proprietor')
       if (res.ok) {
         setEstablishments(await res.json())
       }

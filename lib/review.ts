@@ -37,3 +37,22 @@ export async function getReceivedReviews(userId: number, searchTerm: string = ''
   return res.rows
 }
 
+export async function updateReview(id: number, data: { nota: number, comentario: string }) {
+  const sql = `
+    UPDATE Avaliacao
+    SET nota = $1, comentario = $2
+    WHERE id_avaliacao = $3
+    RETURNING *
+  `
+  const res = await query(sql, [data.nota, data.comentario, id])
+  return res.rows[0]
+}
+
+export async function deleteReview(id: number) {
+  const sql = `
+    DELETE FROM Avaliacao
+    WHERE id_avaliacao = $1
+  `
+  await query(sql, [id])
+}
+
