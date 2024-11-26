@@ -10,7 +10,7 @@ import { getUserById } from '@/lib/usuario'
 const inter = Inter({ subsets: ['latin'] })
 
 async function getCurrentUserId() {
-  return process.env.USER_ID;
+  return Number(process.env.USER_ID)
 }
 
 const userId = await getCurrentUserId();
@@ -34,30 +34,33 @@ const proprietarioNavItems = [
   { name: 'Contracts', href: '/contracts', icon: FileText },
 ]
 
+async function getUserType() {
+  const userId = await getCurrentUserId();
+  const user = await getUserById(userId);
+
+  if (!user) {
+    return 'unknown';
+  }
+
+  const artist = await getArtistaByUserId(userId);
+  const establishment = await getEstabelecimentoByProprietarioId(userId);
+
+  if (artist) {
+    return 'artist';
+  } else if (establishment) {
+    return 'proprietario';
+  } else {
+    return 'unknown';
+  }
+}
+
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const userIdStr = await getCurrentUserId();  // Aqui retornará string | undefined
-  if (!userIdStr) {
-    throw new Error("User ID not found");
-  }
-
-  // Converte o userId para number
-  const userId = Number(userIdStr);
-
-  if (isNaN(userId)) {
-    throw new Error("Invalid User ID");
-  }
-
-  // Agora o userId é um número válido
-  const user = await getUserById(userId);
-  const artist = await getArtistaByUserId(userId);
-  const establishment = await getEstabelecimentoByProprietarioId(userId);
-
-  const navItems = artist ? artistNavItems : proprietarioNavItems;
-
+  const userType = await getUserType()
+  const navItems = userType === 'artist' ? artistNavItems : proprietarioNavItems
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -97,7 +100,7 @@ export default async function RootLayout({
           </main>
           <footer className="bg-white border-t border-gray-100 py-6">
             <div className="container mx-auto px-4 text-center text-sm text-gray-600">
-              <p>&copy; 2023 Sua Melodia. All rights reserved.</p>
+              <p>&copy; 2024 Sua Melodia. All rights reserved.</p>
             </div>
           </footer>
         </div>
