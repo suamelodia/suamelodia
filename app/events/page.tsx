@@ -4,7 +4,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { query } from '@/lib/dbUtils'
 
-async function searchEvents(searchTerm: string) {
+interface Event {
+  id_evento: number;
+  descricao: string;
+  data_inicio: string;
+  data_termino: string;
+  tipo: string;
+  status: string;
+  estabelecimento_nome: string | null;
+}
+
+async function searchEvents(searchTerm: string): Promise<Event[]> {
   const sql = `
     SELECT e.*, es.nome as estabelecimento_nome
     FROM Evento e
@@ -38,7 +48,7 @@ export default async function EventsPage({ searchParams }: { searchParams: { sea
         </form>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.map((event) => (
+        {events.map((event: Event) => (
           <Card key={event.id_evento}>
             <CardHeader>
               <CardTitle>{event.descricao}</CardTitle>

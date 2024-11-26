@@ -9,7 +9,18 @@ async function getCurrentUserId() {
 }
 
 export default async function Home() {
-  const userId = await getCurrentUserId();
+  const userIdStr = await getCurrentUserId();  // Isso ainda retorna string | undefined
+  if (!userIdStr) {
+    return <div>User ID not found</div>; // Se o userId não for encontrado
+  }
+
+  // Converte o userId para number
+  const userId = Number(userIdStr);
+
+  if (isNaN(userId)) {
+    return <div>Invalid User ID</div>;  // Caso o userId não seja um número válido
+  }
+
   const user = await getUserById(userId);
 
   if (!user) {
@@ -27,4 +38,3 @@ export default async function Home() {
     return <div>Unknown user type</div>;
   }
 }
-

@@ -7,8 +7,23 @@ import { StarRating } from '@/app/components/StarRating'
 import { getRandomAvatarUrl } from '@/lib/utils'
 import { query } from '@/lib/dbUtils'
 import { MessageSquare } from 'lucide-react'
+import { getProprietarioByUserId } from '@/lib/proprietario'
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogHeader } from '@/components/ui/dialog'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { getContratosAvailableByEventoAndArtist } from '@/lib/contrato'
+import { getEventosByProprietarioId } from '@/lib/evento'
+import { DialogApply } from '../components/dialogApply'
 
-async function searchArtists(searchTerm: string) {
+// Defina o tipo dos artistas
+type Artist = {
+  id_artista: number
+  nome_artista: string
+  genero: string | null
+  eh_banda: boolean
+  ano_formacao: number | null
+}
+
+async function searchArtists(searchTerm: string): Promise<Artist[]> {
   const sql = `
     SELECT a.*, u.nome as nome_artista, u.ImagemPerfil as imagem, gm.nome as genero,
            COALESCE(AVG(av.nota), 0) as avg_rating,
@@ -24,9 +39,18 @@ async function searchArtists(searchTerm: string) {
   return res.rows
 }
 
+async function getCurrentUserId() {
+  return parseInt(process.env.USER_ID || "0", 10);
+}
+
 export default async function ArtistsPage({ searchParams }: { searchParams: { search: string } }) {
   const searchTerm = searchParams.search || ''
-  const artists = await searchArtists(searchTerm)
+  const artists: Artist[] = await searchArtists(searchTerm)
+
+  const userId = await getCurrentUserId()
+  const proprietario = await getProprietarioByUserId(userId)
+
+  const events = await getEventosByProprietarioId(proprietario.id_proprietario)
 
   return (
     <div className="space-y-6">
@@ -70,7 +94,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: { se
               <p className="text-gray-600 mb-2">Genre: {artist.genero || 'Not specified'}</p>
               <p className="text-gray-600 mb-2">Type: {artist.eh_banda ? 'Band' : 'Solo Artist'}</p>
               {artist.ano_formacao && <p className="text-gray-600 mb-2">Formed in: {artist.ano_formacao}</p>}
-              <div className="flex justify-between items-center mt-4">
+              <div className='flex justify-between mt-4'>
                 <div className="flex items-center space-x-1">
                   <MessageSquare className="w-4 h-4 text-gray-500" />
                   <span className="text-sm text-gray-500">{artist.review_count} reviews</span>
@@ -78,6 +102,42 @@ export default async function ArtistsPage({ searchParams }: { searchParams: { se
                 <Link href={`/artists/${artist.id_artista}`}>
                   <Button variant="outline" size="sm">View Profile</Button>
                 </Link>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button>Apply</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <ScrollArea className="max-h-96 mt-4">
+                    {events.map(async (event: any) => (
+                      event.status !== "Cancelado" &&
+                        (
+                          <div  key={event.id_evento}>
+                                <DialogHeader>
+                                  <DialogTitle>{event.descricao}</DialogTitle>
+                                </DialogHeader>
+                                <ScrollArea className='max-w-full overflow-auto'>
+                                  <div className="flex w-max space-x-4 p-4">
+                                    {await getContratosAvailableByEventoAndArtist(event.id_evento, artist.id_artista).then((contracts) =>
+                                      contracts.map((contract: any) => (
+                                          <DialogApply
+                                          key={contract.id_contrato}
+                                          contract={contract}
+                                          userId={userId}
+                                          artista={artist}
+                                          proprietario={proprietario}
+                                          id_evento={event.id_evento}
+                                          />
+                                      ))
+                                    )}
+                                  </div>
+                                  <ScrollBar orientation="horizontal" />
+                                </ScrollArea>
+                          </div>
+                      )
+                    ))}
+                    </ScrollArea>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </Card>
@@ -86,4 +146,3 @@ export default async function ArtistsPage({ searchParams }: { searchParams: { se
     </div>
   )
 }
-

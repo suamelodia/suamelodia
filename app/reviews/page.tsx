@@ -71,4 +71,3 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { se
     </div>
   )
 }
-
