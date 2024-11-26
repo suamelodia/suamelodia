@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { StarRating } from '@/app/components/StarRating'
-import { getRandomAvatarUrl } from '@/lib/utils'
 import { query } from '@/lib/dbUtils'
 import { MessageSquare } from 'lucide-react'
 import { getProprietarioByUserId } from '@/lib/proprietario'
@@ -74,7 +73,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: { se
               <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 overflow-hidden rounded-full">
                   <Image
-                    src={artist.imagem}
+                    src={artist.imagem || '/placeholder.svg'}
                     alt={`${artist.nome_artista} avatar`}
                     width={64}
                     height={64}
@@ -94,11 +93,11 @@ export default async function ArtistsPage({ searchParams }: { searchParams: { se
               <p className="text-gray-600 mb-2">Genre: {artist.genero || 'Not specified'}</p>
               <p className="text-gray-600 mb-2">Type: {artist.eh_banda ? 'Band' : 'Solo Artist'}</p>
               {artist.ano_formacao && <p className="text-gray-600 mb-2">Formed in: {artist.ano_formacao}</p>}
+              <div className="flex items-center space-x-1 mb-4">
+                <MessageSquare className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-500">{artist.review_count} reviews</span>
+              </div>
               <div className='flex justify-between mt-4'>
-                <div className="flex items-center space-x-1">
-                  <MessageSquare className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-500">{artist.review_count} reviews</span>
-                </div>
                 <Link href={`/artists/${artist.id_artista}`}>
                   <Button variant="outline" size="sm">View Profile</Button>
                 </Link>
@@ -106,35 +105,37 @@ export default async function ArtistsPage({ searchParams }: { searchParams: { se
                   <DialogTrigger asChild>
                     <Button>Apply</Button>
                   </DialogTrigger>
-                  <DialogContent>
-                    <ScrollArea className="max-h-96 mt-4">
-                    {events.map(async (event: any) => (
-                      event.status !== "Cancelado" &&
-                        (
-                          <div  key={event.id_evento}>
-                                <DialogHeader>
-                                  <DialogTitle>{event.descricao}</DialogTitle>
-                                </DialogHeader>
-                                <ScrollArea className='max-w-full overflow-auto'>
-                                  <div className="flex w-max space-x-4 p-4">
-                                    {await getContratosAvailableByEventoAndArtist(event.id_evento, artist.id_artista).then((contracts) =>
-                                      contracts.map((contract: any) => (
-                                          <DialogApply
-                                          key={contract.id_contrato}
-                                          contract={contract}
-                                          userId={userId}
-                                          artista={artist}
-                                          proprietario={proprietario}
-                                          id_evento={event.id_evento}
-                                          />
-                                      ))
-                                    )}
-                                  </div>
-                                  <ScrollBar orientation="horizontal" />
-                                </ScrollArea>
-                          </div>
-                      )
-                    ))}
+                  <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
+                    <DialogHeader>
+                      <DialogTitle>Available Events for {artist.nome_artista}</DialogTitle>
+                    </DialogHeader>
+                    <ScrollArea className="flex-grow">
+                      <div className="space-y-4 p-4">
+                        {events.map((event) => (
+                          event.status !== "Cancelado" && (
+                            <div key={event.id_evento} className="border-b pb-4 last:border-b-0">
+                              <h3 className="text-lg font-semibold mb-2">{event.descricao}</h3>
+                              <ScrollArea className="w-full whitespace-nowrap rounded-md border">
+                                <div className="flex w-max space-x-4 p-4">
+                                  {getContratosAvailableByEventoAndArtist(event.id_evento, artist.id_artista).then((contracts: Contract[]) =>
+                                    contracts.map((contract) => (
+                                      <DialogApply
+                                        key={contract.id_contrato}
+                                        contract={contract}
+                                        userId={userId}
+                                        artista={artist}
+                                        proprietario={proprietario}
+                                        id_evento={event.id_evento}
+                                      />
+                                    ))
+                                  )}
+                                </div>
+                                <ScrollBar orientation="horizontal" />
+                              </ScrollArea>
+                            </div>
+                          )
+                        ))}
+                      </div>
                     </ScrollArea>
                   </DialogContent>
                 </Dialog>
