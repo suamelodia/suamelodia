@@ -1,9 +1,13 @@
-import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { query } from '@/lib/dbUtils'
+import { getUserById } from "@/lib/usuario"
+import { getArtistaByUserId } from "@/lib/artista"
+import { getContratosAvailableByEvento } from "@/lib/contrato"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { DialogApply } from "@/app/components/dialogApply"
 
 // Definir o tipo do Evento
 type Event = {
@@ -27,9 +31,17 @@ async function searchEvents(searchTerm: string): Promise<Event[]> {
   return res.rows
 }
 
+async function getCurrentUserId() {
+  return parseInt(process.env.USER_ID || "0", 10);
+}
+
 export default async function BrowseEventsPage({ searchParams }: { searchParams: { search: string } }) {
   const searchTerm = searchParams.search || ''
   const events = await searchEvents(searchTerm)
+
+    const userId = await getCurrentUserId()
+    const user = await getUserById(userId)
+    const artist = await getArtistaByUserId(userId)
 
   return (
     <div className="space-y-6">
@@ -47,11 +59,9 @@ export default async function BrowseEventsPage({ searchParams }: { searchParams:
         </form>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.map((event: Event | undefined) => {  // Garantir que event seja do tipo Event ou undefined
-          if (!event) return null;  // Se event for undefined, não renderiza nada
-
-          return (
-            <Card key={event.id_evento}>
+        {events.map(async (event: any) => (
+          event.status !== "Cancelado" &&
+            (<Card key={event.id_evento}>
               <CardHeader>
                 <CardTitle>{event.descricao}</CardTitle>
               </CardHeader>
@@ -78,14 +88,38 @@ export default async function BrowseEventsPage({ searchParams }: { searchParams:
                       </div>
                     </DialogContent>
                   </Dialog>
-                  <Link href={`/events/apply/${event.id_evento}`}>
-                    <Button>Apply</Button>
-                  </Link>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button>Apply</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>{event.descricao}</DialogTitle>
+                      </DialogHeader>
+                      <ScrollArea>
+                        <div className="flex w-max space-x-4 p-4">
+                          {await getContratosAvailableByEvento(event.id_evento).then((contracts) =>
+                            contracts.map((contract: any) => (
+                                <DialogApply
+                                key={contract.id_contrato}
+                                contract={contract}
+                                userId={userId}
+                                artista={artist}
+                                proprietario={null}
+                                id_evento={event.id_evento}
+                                />
+                            ))
+                          )}
+                          </div>
+                        <ScrollBar orientation="horizontal" />
+                      </ScrollArea>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardContent>
             </Card>
-          )
-        })}
+            )
+        ))}
       </div>
     </div>
   )
