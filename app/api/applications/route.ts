@@ -3,7 +3,6 @@ import { createAplicacao, getAplicacoesByContrato, updateAplicacao, deleteAplica
 import { getUserById } from '@/lib/usuario'
 import { getArtistaByUserId } from '@/lib/artista'
 import { getProprietarioByUserId } from '@/lib/proprietario'
-import { updateIdAplicacaoContrato } from '@/lib/contrato'
 
 export async function POST(request: Request) {
   try {
@@ -32,7 +31,6 @@ export async function POST(request: Request) {
 
     
     const application = await createAplicacao(applicationData)
-    await updateIdAplicacaoContrato(body.id_contrato, application.id_aplicacao)
     return NextResponse.json(application)
   } catch (error) {
     return NextResponse.json({ error: 'Failed to create application' }, { status: 500 })

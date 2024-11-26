@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import { getAplicacoesByArtista } from '@/lib/aplicacoes'
 import { ScrollBar } from '@/components/ui/scroll-area'
 import { ScrollArea } from '@radix-ui/react-scroll-area'
