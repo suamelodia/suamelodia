@@ -28,19 +28,29 @@ const proprietarioNavItems = [
   { name: 'Contracts', href: '/contracts', icon: FileText },
 ]
 
-const userId = await getCurrentUserId();
-const user = await getUserById(userId);
-const artist = await getArtistaByUserId(userId);
-const establishment = await getEstabelecimentoByProprietarioId(userId);
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  console.log('artist', artist)
-  console.log('establishment', establishment)
-  const navItems = artist ? artistNavItems : proprietarioNavItems
+  const userIdStr = await getCurrentUserId();  // Aqui retornará string | undefined
+  if (!userIdStr) {
+    throw new Error("User ID not found");
+  }
+
+  // Converte o userId para number
+  const userId = Number(userIdStr);
+
+  if (isNaN(userId)) {
+    throw new Error("Invalid User ID");
+  }
+
+  // Agora o userId é um número válido
+  const user = await getUserById(userId);
+  const artist = await getArtistaByUserId(userId);
+  const establishment = await getEstabelecimentoByProprietarioId(userId);
+
+  const navItems = artist ? artistNavItems : proprietarioNavItems;
 
   return (
     <html lang="en">
@@ -89,4 +99,3 @@ export default function RootLayout({
     </html>
   )
 }
-

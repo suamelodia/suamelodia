@@ -5,7 +5,18 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { query } from '@/lib/dbUtils'
 
-async function searchEvents(searchTerm: string) {
+// Definir o tipo do Evento
+type Event = {
+  id_evento: number
+  descricao: string
+  data_inicio: string
+  data_termino: string
+  tipo: string
+  status: string
+  estabelecimento_nome: string | null
+}
+
+async function searchEvents(searchTerm: string): Promise<Event[]> {
   const sql = `
     SELECT e.*, es.nome as estabelecimento_nome
     FROM Evento e
@@ -36,43 +47,46 @@ export default async function BrowseEventsPage({ searchParams }: { searchParams:
         </form>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.map((event) => (
-          <Card key={event.id_evento}>
-            <CardHeader>
-              <CardTitle>{event.descricao}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Date: {new Date(event.data_inicio).toLocaleDateString()} - {new Date(event.data_termino).toLocaleDateString()}</p>
-              <p>Venue: {event.estabelecimento_nome || 'Not specified'}</p>
-              <p>Type: {event.tipo}</p>
-              <p>Status: {event.status}</p>
-              <div className="flex justify-between items-center mt-4">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline">View Details</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>{event.descricao}</DialogTitle>
-                    </DialogHeader>
-                    <div className="mt-4">
-                      <p><strong>Date:</strong> {new Date(event.data_inicio).toLocaleString()} - {new Date(event.data_termino).toLocaleString()}</p>
-                      <p><strong>Venue:</strong> {event.estabelecimento_nome || 'Not specified'}</p>
-                      <p><strong>Type:</strong> {event.tipo}</p>
-                      <p><strong>Status:</strong> {event.status}</p>
-                      <p><strong>Description:</strong> {event.descricao}</p>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-                <Link href={`/events/apply/${event.id_evento}`}>
-                  <Button>Apply</Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        {events.map((event: Event | undefined) => {  // Garantir que event seja do tipo Event ou undefined
+          if (!event) return null;  // Se event for undefined, não renderiza nada
+
+          return (
+            <Card key={event.id_evento}>
+              <CardHeader>
+                <CardTitle>{event.descricao}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>Date: {new Date(event.data_inicio).toLocaleDateString()} - {new Date(event.data_termino).toLocaleDateString()}</p>
+                <p>Venue: {event.estabelecimento_nome || 'Not specified'}</p>
+                <p>Type: {event.tipo}</p>
+                <p>Status: {event.status}</p>
+                <div className="flex justify-between items-center mt-4">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline">View Details</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>{event.descricao}</DialogTitle>
+                      </DialogHeader>
+                      <div className="mt-4">
+                        <p><strong>Date:</strong> {new Date(event.data_inicio).toLocaleString()} - {new Date(event.data_termino).toLocaleString()}</p>
+                        <p><strong>Venue:</strong> {event.estabelecimento_nome || 'Not specified'}</p>
+                        <p><strong>Type:</strong> {event.tipo}</p>
+                        <p><strong>Status:</strong> {event.status}</p>
+                        <p><strong>Description:</strong> {event.descricao}</p>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <Link href={`/events/apply/${event.id_evento}`}>
+                    <Button>Apply</Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
     </div>
   )
 }
-

@@ -4,6 +4,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { query } from '@/lib/dbUtils'
 
+// Definir o tipo Contract
+type Contract = {
+  id_contrato: number
+  evento_descricao: string
+  artista_nome: string
+  valor: number
+  status_pagamento: string
+}
+
 async function searchContracts(searchTerm: string) {
   const sql = `
     SELECT c.*, e.descricao as evento_descricao, u.nome as artista_nome
@@ -40,7 +49,7 @@ export default async function ContractsPage({ searchParams }: { searchParams: { 
         </form>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {contracts.map((contract) => (
+        {contracts.map((contract: Contract) => (
           <Card key={contract.id_contrato}>
             <CardHeader>
               <CardTitle>{contract.evento_descricao}</CardTitle>
@@ -59,4 +68,3 @@ export default async function ContractsPage({ searchParams }: { searchParams: { 
     </div>
   )
 }
-
