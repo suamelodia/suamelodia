@@ -1,41 +1,68 @@
-import { getContratoById } from '@/lib/contrato'
-import { getEventoById } from '@/lib/evento'
+import { getContratosByEvento } from '@/lib/contrato'
+import { getEventosByProprietarioId } from '@/lib/evento'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { getAplicacoesByContratoFromArtist } from '@/lib/aplicacoes'
+import { AppliesForContracts } from '../components/buttonsApplies'
+import { getProprietarioByUserId } from '@/lib/proprietario'
 import { getArtistaById } from '@/lib/artista'
 import { getUserById } from '@/lib/usuario'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Link from 'next/link'
 
 export default async function ContractDetailPage({ params }: { params: { id: string } }) {
-  const contract = await getContratoById(parseInt(params.id))
-  const event = contract ? await getEventoById(contract.id_evento) : null
-  const artist = contract ? await getArtistaById(contract.id_artista) : null
-  const user = artist ? await getUserById(artist.id_usuario) : null
+  const proprietario = await getProprietarioByUserId(parseInt(params.id));
+  const events = await getEventosByProprietarioId(proprietario.id_proprietario)
 
-  if (!contract || !event || !artist || !user) {
-    return <div>Contract not found</div>
+  if (!events) {
+    return <div className='h-full w-full flex items-center justify-center'>Não há contratos disponíveis</div>
   }
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Contract Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p><strong>Event:</strong> {event.descricao}</p>
-          <p><strong>Artist:</strong> {user.nome}</p>
-          <p><strong>Value:</strong> ${contract.valor}</p>
-          <p><strong>Payment Status:</strong> {contract.status_pagamento}</p>
-          <p><strong>Conditions:</strong> {contract.condicoes || 'No specific conditions'}</p>
-        </CardContent>
-      </Card>
-      <div className="flex justify-end space-x-4">
-        <Link href={`/contracts/${params.id}/edit`}>
-          <Button variant="outline">Edit</Button>
-        </Link>
-        <Button variant="destructive">Delete</Button>
-      </div>
+      {events.map(async (event) => (
+        <div key={event.id_evento}>
+          <Card>
+            <CardHeader>
+              <CardTitle>{event.descricao}</CardTitle>
+            </CardHeader>
+            <CardContent className='flex flex-col gap-y-4'>
+              {await getContratosByEvento(event.id_evento).then((contracts) =>
+                contracts.map(async (contract: any) => (
+                  <div key={contract.id_contrato} className='border-2 rounded-md p-4 flex flex-col gap-6'>
+                    <div className=' gap-5 flex'>
+                      <p><strong>Valor:</strong> {contract.valor}</p>
+                      <p><strong>Condições:</strong> {contract.condicoes}</p>
+                    </div>
+                    <div>
+                      <p><strong>Aplicações:</strong></p>
+                      {await getAplicacoesByContratoFromArtist(contract.id_contrato).then((applies) => (
+                        applies.map(async (apply: any) => (
+                          <AppliesForContracts key={apply.id_aplicacao} contract={contract} apply={apply} userId={parseInt(params.id)} >
+                            <div className='flex gap-5'>
+                              {apply.valorproposta ? <p><strong>Valor proposta:</strong> {apply.valorproposta}</p>
+                                : <p><strong>Valor:</strong> {contract.valor}</p>}
+                              <p><strong>Artista:</strong> {await getArtistaById(apply.id_artista).then(async (artista) => { return await getUserById(artista.id_usuario).then((user) => { return user.nome }) })}</p>
+                            </div>
+                          </AppliesForContracts>
+                        ))
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+              {/* <p><strong>Event:</strong> {event.descricao}</p>
+              <p><strong>Artist:</strong> {user.nome}</p>
+              <p><strong>Value:</strong> ${contract.valor}</p>
+              <p><strong>Payment Status:</strong> {contract.status_pagamento}</p>
+              <p><strong>Conditions:</strong> {contract.condicoes || 'No specific conditions'}</p> */}
+            </CardContent>
+          </Card>
+          {/* <div className="flex justify-end space-x-4">
+            <Link href={`/contracts/${params.id}/edit`}>
+              <Button variant="outline">Edit</Button>
+            </Link>
+            <Button variant="destructive">Delete</Button>
+          </div> */}
+        </div>
+      ))}
     </div>
   )
 }

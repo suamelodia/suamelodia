@@ -34,7 +34,7 @@ export function DialogApply({ userId, artista, proprietario, contract, id_evento
         body: JSON.stringify(formData),
       })
       if (res.ok) {
-        router.push(`/events/${id_evento}`)
+        router.push(`/events/browse`)
       } else {
         console.error('Failed to create application')
       }
@@ -61,7 +61,7 @@ export function DialogApply({ userId, artista, proprietario, contract, id_evento
         body: JSON.stringify(formData),
       })
       if (res.ok) {
-        router.push(`/events/${id_evento}`)
+        router.push(`/artists`)
       } else {
         console.error('Failed to create application')
       }
@@ -72,29 +72,29 @@ export function DialogApply({ userId, artista, proprietario, contract, id_evento
 
   return (
     <div>
-      {!proprietario ? 
-              <div className="p-4 rounded-md border-2 space-y-4">
-                <p><strong>Valor:</strong> {contract.valor}</p>
-                <p><strong>Condições:</strong> {contract.condicoes}</p>
-                <div className="space-y-2">
-                  <label htmlFor="valorProposta" className="block text-sm font-medium text-gray-700">Proposta de Valor:</label>
-                  <Input
-                    id="valorProposta"
-                    name="valorProposta"
-                    type="number"
-                    placeholder="350,00"
-                    value={propostas[contract.id_contrato] || ''}
-                    onChange={(e) => handleInputChange(contract.id_contrato, e.target.value)}
-                  />
-                </div>
-                <Button onClick={() => handleApply(contract)}>Aplicar</Button>
-              </div>
-              :
-              <div className="p-4 rounded-md border-2 space-y-4">
-                <p><strong>Valor:</strong> {contract.valor}</p>
-                <p><strong>Condições:</strong> {contract.condicoes}</p>
-                <Button onClick={() => handleInvite(contract)}>Convidar</Button>
-              </div>
+      {!proprietario ?
+        <div className="p-4 rounded-md border-2 space-y-4">
+          <p><strong>Valor:</strong> {contract.valor}</p>
+          <p><strong>Condições:</strong> {contract.condicoes}</p>
+          <div className="space-y-2">
+            <label htmlFor="valorProposta" className="block text-sm font-medium text-gray-700">Proposta de Valor:</label>
+            <Input
+              id="valorProposta"
+              name="valorProposta"
+              type="number"
+              placeholder="350,00"
+              value={propostas[contract.id_contrato] || ''}
+              onChange={(e) => handleInputChange(contract.id_contrato, e.target.value)}
+            />
+          </div>
+          <Button onClick={() => handleApply(contract)}>Aplicar</Button>
+        </div>
+        :
+        <div className="p-4 rounded-md border-2 space-y-4">
+          <p><strong>Valor:</strong> {contract.valor}</p>
+          <p><strong>Condições:</strong> {contract.condicoes}</p>
+          <Button onClick={() => handleInvite(contract)}>Convidar</Button>
+        </div>
       }
     </div>
   )
