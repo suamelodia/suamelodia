@@ -12,7 +12,7 @@ export default function EventApplicationStatusScreen() {
               <CardTitle>Event Name {application}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Date: 2023-06-{application}</p>
+              <p>Date: 2024-06-{application}</p>
               <p>Status: {application % 2 === 0 ? 'Pending' : 'Approved'}</p>
               <Button variant="outline" className="mt-2">Withdraw</Button>
             </CardContent>
