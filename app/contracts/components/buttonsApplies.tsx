@@ -19,7 +19,7 @@ export function AppliesForContracts({ children, contract, apply, userId }) {
     const handleButton = async (contrato, accepted) => {
         const formData = {
             from_artist: apply.from_artist,
-            valorProposta: apply.valorProposta,
+            valorProposta: apply.valorProposta, // ta zerando o valor
             status_aplicacao: 'Concluída',
             is_accepted: accepted,
             comentario_dest: comentarios[contrato.id_contrato] || null,

@@ -24,7 +24,6 @@ const artistNavItems = artist && [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Browse Events', href: '/events/browse', icon: CalendarDays },
   { name: 'Reviews', href: '/reviews', icon: Star },
-  { name: 'Contracts', href: `/contracts/${userId}`, icon: FileText },
   { name: 'Aplicações', href: `/applies/${userId}`, icon: ClipboardEditIcon },
 ]
 
