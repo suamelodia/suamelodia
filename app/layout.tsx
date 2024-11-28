@@ -24,7 +24,7 @@ const artistNavItems = artist && [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Browse Events', href: '/events/browse', icon: CalendarDays },
   { name: 'Reviews', href: '/reviews', icon: Star },
-  { name: 'Aplicações', href: `/applies/${userId}`, icon: ClipboardEditIcon },
+  { name: 'Applies', href: `/applies/${userId}`, icon: ClipboardEditIcon },
 ]
 
 const proprietarioNavItems = proprietario && [
@@ -73,7 +73,7 @@ export default async function RootLayout({
                 <Link href="/" className="flex items-center">
                   <Image
                     src="/logo.png"
-                    alt="Sua Melodia"
+                    alt="ShowMatch"
                     width={3428}
                     height={1072}
                     className="h-10 w-auto"
@@ -102,7 +102,7 @@ export default async function RootLayout({
           </main>
           <footer className="bg-white border-t border-gray-100 py-6">
             <div className="container mx-auto px-4 text-center text-sm text-gray-600">
-              <p>&copy; 2024 Sua Melodia. All rights reserved.</p>
+              <p>&copy; 2024 ShowMatch. All rights reserved.</p>
             </div>
           </footer>
         </div>

@@ -32,7 +32,7 @@ export default async function ContractDetailPage({ params }: { params: { id: str
                       <p><strong>Condições:</strong> {contract.condicoes}</p>
                     </div>
                     <div>
-                      <p><strong>Aplicações:</strong></p>
+                      <p><strong>Applies:</strong></p>
                       {await getAplicacoesByContratoFromArtist(contract.id_contrato).then((applies) => (
                         applies.map(async (apply: any) => (
                           <AppliesForContracts key={apply.id_aplicacao} contract={contract} apply={apply} userId={parseInt(params.id)} >

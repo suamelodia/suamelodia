@@ -1,6 +1,13 @@
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, Star, FileText } from 'lucide-react'
+import { Users, Star, FileText, ClipboardEditIcon } from 'lucide-react'
+
+async function getCurrentUserId() {
+    return Number(process.env.USER_ID)
+}
+
+const userId = await getCurrentUserId();
+
 
 export default function ArtistHome() {
     const sections = [
@@ -17,17 +24,17 @@ export default function ArtistHome() {
             description: 'View your reviews and ratings'
         },
         {
-            title: 'Contracts',
-            icon: FileText,
-            href: '/contracts',
-            description: 'Manage your event contracts'
+            title: 'Applies',
+            icon: ClipboardEditIcon,
+            href: `/applies/${userId}`,
+            description: 'Manage your applies'
         },
     ]
 
     return (
         <div className="space-y-8 py-8">
             <div className="text-center space-y-4">
-                <h1 className="text-4xl font-bold text-gray-900">Welcome to Sua Melodia, Artist!</h1>
+                <h1 className="text-4xl font-bold text-gray-900">Welcome to ShowMatch, Artist!</h1>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                     Explore opportunities, manage your reviews, and handle your contracts all in one place.
                 </p>

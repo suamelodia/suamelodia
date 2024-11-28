@@ -45,7 +45,7 @@ export default function ProprietarioHome() {
     return (
         <div className="space-y-8 py-8">
             <div className="text-center space-y-4">
-                <h1 className="text-4xl font-bold text-gray-900">Welcome to Sua Melodia, Proprietor!</h1>
+                <h1 className="text-4xl font-bold text-gray-900">Welcome to ShowMatch, Proprietor!</h1>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                     Manage your events, artists, reviews, and contracts all in one place.
                 </p>

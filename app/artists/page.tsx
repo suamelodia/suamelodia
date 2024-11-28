@@ -103,7 +103,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: { se
                 </Link>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button>Apply</Button>
+                    <Button>Invite</Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
                     <DialogHeader>
