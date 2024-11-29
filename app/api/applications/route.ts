@@ -21,6 +21,7 @@ export async function POST(request: Request) {
 
     const applicationData = {
       from_artist: artist ? true : false,
+      from_proprietor: artist ? false : true,
       status_aplicacao: 'Pendente',
       valorproposta: body.valorProposta,
       is_accepted: false,

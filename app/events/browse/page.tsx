@@ -99,7 +99,7 @@ export default async function BrowseEventsPage({ searchParams }: { searchParams:
                     <ScrollArea>
                       <div className="flex w-max space-x-4 p-4">
                         {await getContratosAvailableByEventoAndArtist(event.id_evento, artist.id_artista).then((contracts) =>
-                          contracts.map((contract: any) => (
+                          contracts.length > 0 ? contracts.map((contract: any) => (
                             <DialogApply
                               key={contract.id_contrato}
                               contract={contract}
@@ -109,6 +109,10 @@ export default async function BrowseEventsPage({ searchParams }: { searchParams:
                               id_evento={event.id_evento}
                             />
                           ))
+                          :
+                          <div>
+                            <p>Não há contratos para esse evento</p>
+                          </div>
                         )}
                       </div>
                       <ScrollBar orientation="horizontal" />

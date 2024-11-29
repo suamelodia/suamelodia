@@ -6,7 +6,7 @@ export async function getAplicacoesByContrato(contratoId: number) {
 }
 
 export async function getAplicacoesByContratoFromArtist(contratoId: number) {
-  const res = await query('SELECT * FROM Aplicacao WHERE id_contrato = $1 AND From_Artist = true AND (status_aplicacao <> $2 AND is_accepted = false)', [contratoId, 'Concluída']);
+  const res = await query('SELECT a.* FROM Aplicacao a WHERE a.id_contrato = $1 AND a.From_Artist = true AND a.id_aplicacao NOT IN (SELECT b.id_aplicacao FROM Aplicacao b WHERE b.status_aplicacao = $2 AND b.is_accepted = false)', [contratoId, 'Concluída']);
   return res.rows;
 }
 

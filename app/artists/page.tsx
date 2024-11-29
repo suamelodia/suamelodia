@@ -111,14 +111,14 @@ export default async function ArtistsPage({ searchParams }: { searchParams: { se
                     </DialogHeader>
                     <ScrollArea className="flex-grow">
                       <div className="space-y-4 p-4">
-                        {events.map((event) => (
+                        {events.map(async (event) => (
                           event.status !== "Cancelado" && (
                             <div key={event.id_evento} className="border-b pb-4 last:border-b-0">
                               <h3 className="text-lg font-semibold mb-2">{event.descricao}</h3>
                               <ScrollArea className="w-full whitespace-nowrap rounded-md border">
                                 <div className="flex w-max space-x-4 p-4">
-                                  {getContratosAvailableByEventoAndArtist(event.id_evento, artist.id_artista).then((contracts: Contract[]) =>
-                                    contracts.map((contract) => (
+                                  {await getContratosAvailableByEventoAndArtist(event.id_evento, artist.id_artista).then((contracts) =>
+                                    contracts.length > 0 ? contracts.map((contract) => (
                                       <DialogApply
                                         key={contract.id_contrato}
                                         contract={contract}
@@ -128,6 +128,10 @@ export default async function ArtistsPage({ searchParams }: { searchParams: { se
                                         id_evento={event.id_evento}
                                       />
                                     ))
+                                    :
+                                    <div>
+                                      <p>Não há contratos para esse evento</p>
+                                    </div>
                                   )}
                                 </div>
                                 <ScrollBar orientation="horizontal" />
