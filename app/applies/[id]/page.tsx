@@ -8,6 +8,10 @@ import { getEventoById } from '@/lib/evento'
 export default async function AppliesPage({ params }: { params: { id: string } }) {
   const applies = await getAplicacoesByArtista(parseInt(params.id))
 
+  const appliesReceived = applies.from_artist === true
+  const appliesSended = applies.from_artist === false
+  const appliesSigned = applies.is_accepted === true
+
   return (
     <div className="space-y-6">
       <ScrollArea>
