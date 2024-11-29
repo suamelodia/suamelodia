@@ -75,6 +75,7 @@ export async function PUT(request: Request) {
       status_aplicacao: body.status_aplicacao,
       valorproposta: body.valorProposta,
       is_accepted: body.is_accepted,
+      accepted_timestamp: new Date().toISOString(),
       comentario_dest: body.comentario_dest || null,
       id_artista: body.id_artista,
       id_contrato: body.id_contrato

@@ -8,7 +8,6 @@ import { useState } from "react";
 export function AppliesForContracts({ children, contract, apply, userId }) {
     const [comentarios, setComentarios] = useState<Record<string, string | null>>({});
 
-
     const handleInputChange = (id_contrato: string, value: string) => {
         setComentarios((prev) => ({
             ...prev,
@@ -17,11 +16,10 @@ export function AppliesForContracts({ children, contract, apply, userId }) {
     };
 
     const handleButton = async (contrato, accepted) => {
-        console.log(JSON.stringify(apply))
         const formData = {
             from_artist: apply.from_artist,
             from_proprietor: apply.from_proprietor,
-            valorProposta: apply.valorProposta, // ta zerando o valor
+            valorProposta: apply.valorproposta,
             status_aplicacao: 'Concluída',
             is_accepted: accepted,
             comentario_dest: comentarios[contrato.id_contrato] || null,
@@ -30,6 +28,7 @@ export function AppliesForContracts({ children, contract, apply, userId }) {
         }
 
         try {
+            console.log("FormData antes de enviar:", formData);
             const res = await fetch(`/api/applications?id=${apply.id_aplicacao}`, {
                 method: 'PUT',
                 headers: {
@@ -52,8 +51,8 @@ export function AppliesForContracts({ children, contract, apply, userId }) {
             <div className='flex flex-row justify-between'>
                 {children}
                 <div className='flex gap-5'>
-                    <Button onClick={() => handleButton(contract, true)}>Aceitar</Button>
-                    <Button onClick={() => handleButton(contract, false)}>Rejeitar</Button>
+                    <Button onClick={() => handleButton(contract, true, apply)}>Aceitar</Button>
+                    <Button onClick={() => handleButton(contract, false, apply)}>Rejeitar</Button>
                 </div>
             </div>
             <div>

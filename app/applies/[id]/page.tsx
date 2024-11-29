@@ -8,23 +8,81 @@ import { getEventoById } from '@/lib/evento'
 export default async function AppliesPage({ params }: { params: { id: string } }) {
   const applies = await getAplicacoesByArtista(parseInt(params.id))
 
-  const appliesReceived = applies.from_artist === true
-  const appliesSended = applies.from_artist === false
-  const appliesSigned = applies.is_accepted === true
+  const appliesWithDetails = await Promise.all(
+    applies.map(async (apply: any) => {
+      const contrato = await getContratoById(apply.id_contrato);
+      const evento = await getEventoById(contrato.id_evento);
+
+      return {
+        ...apply,
+        contratoValor: contrato.valor,
+        eventoDescricao: evento.descricao,
+        fromArtist: apply.from_artist,
+        isAccepted: apply.is_accepted,
+      };
+    })
+  );
+
+  const appliesReceived = appliesWithDetails.filter((apply) => !apply.fromArtist && !apply.isAccepted);
+  const appliesSended = appliesWithDetails.filter((apply) => apply.fromArtist && !apply.isAccepted);
+  const appliesSigned = appliesWithDetails.filter((apply) => apply.isAccepted);
 
   return (
     <div className="space-y-6">
-      <ScrollArea>
-        <div className="flex w-max gap-x-6 p-4">
-          {applies.map(async (apply: any) => (
-            <ApplyCard key={apply.id_aplicacao} apply={apply} >
-              <p><strong>{await getContratoById(apply.id_contrato).then(async (contrato) => { return await getEventoById(contrato.id_evento).then((evento) => { return evento.descricao }) })}</strong></p>
-              <h1>Contrato: {await getContratoById(apply.id_contrato).then(async (contrato) => { return contrato.valor })}</h1>
-            </ApplyCard>
-          ))}
+      {appliesSigned.length > 0 &&
+        <div>
+          <p><strong>Signed contracts</strong></p>
+          <ScrollArea>
+            <div className="flex w-max gap-x-6 p-4">
+              {appliesSigned.map((apply: any) => (
+                <ApplyCard key={apply.id_aplicacao} apply={apply} state={0} userId={parseInt(params.id)}>
+                  <p>
+                    <strong>{apply.eventoDescricao}</strong>
+                  </p>
+                  <h1>Contrato: {apply.valorproposta ?? apply.contratoValor}</h1>
+                </ApplyCard>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </div>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
+      }
+      {appliesReceived.length > 0 &&
+        <div>
+          <p><strong>Contracts received</strong></p>
+          <ScrollArea>
+            <div className="flex w-max gap-x-6 p-4">
+              {appliesReceived.map((apply: any) => (
+                <ApplyCard key={apply.id_aplicacao} apply={apply} state={1} userId={parseInt(params.id)}>
+                  <p>
+                    <strong>{apply.eventoDescricao}</strong>
+                  </p>
+                  <h1>Contrato: {apply.contratoValor}</h1>
+                </ApplyCard>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
+      }
+      {appliesSended.length > 0 &&
+        <div>
+          <p><strong>Contracts sended</strong></p>
+          <ScrollArea>
+            <div className="flex w-max gap-x-6 p-4">
+              {appliesSended.map((apply: any) => (
+                <ApplyCard key={apply.id_aplicacao} apply={apply} state={2} userId={parseInt(params.id)}>
+                  <p>
+                    <strong>{apply.eventoDescricao}</strong>
+                  </p>
+                  <h1>Contrato: {apply.contratoValor}</h1>
+                </ApplyCard>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
+      }
     </div>
   )
 }

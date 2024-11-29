@@ -1,7 +1,7 @@
 import { getContratosByEvento } from '@/lib/contrato'
 import { getEventosByProprietarioId } from '@/lib/evento'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getAplicacoesByContratoFromArtist } from '@/lib/aplicacoes'
+import { getAplicacoesByContratoFromArtist, getAplicacoesByContratoFromProprietario } from '@/lib/aplicacoes'
 import { AppliesForContracts } from '../components/buttonsApplies'
 import { getProprietarioByUserId } from '@/lib/proprietario'
 import { getArtistaById } from '@/lib/artista'
@@ -96,11 +96,81 @@ export default async function ContractDetailPage({ params }: { params: { id: str
 
                           return (
                             <div key={`no-applies-${contract.id_contrato}`}>
-                              <p>Não há aplicações para esse contrato</p>
+                              <p>There is no applies for this contract</p>
                             </div>
                           );
                         })}
                     </div>
+                    {/* <div>
+                      <p><strong>Your Invites:</strong></p>
+                      {
+                        await getAplicacoesByContratoFromProprietario(contract.id_contrato).then(async (applies) => {
+                          const acceptedApply = applies.find((apply) => apply.is_accepted);
+
+                          if (acceptedApply) {
+                            const artist = await getArtistaById(acceptedApply.id_artista);
+                            const user = await getUserById(artist.id_usuario);
+
+                            return (
+                              <div key={acceptedApply.id_aplicacao} className='flex gap-3 pt-2'>
+                                <p><strong>Signed contract:</strong></p>
+                                <div className="flex gap-5">
+                                  {acceptedApply.valorproposta ? (
+                                    <p>
+                                      Valor proposta: {acceptedApply.valorproposta}
+                                    </p>
+                                  ) : (
+                                    <p>
+                                      Valor: {contract.valor}
+                                    </p>
+                                  )}
+                                  <p>
+                                    Artista: {user.nome}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          if (applies.length > 0) {
+                            return (
+                              <div key={`applies-${contract.id_contrato}`}>
+                                {await Promise.all(
+                                  applies.map(async (apply) => {
+                                    const artist = await getArtistaById(apply.id_artista);
+                                    const user = await getUserById(artist.id_usuario);
+
+                                    return (
+                                      <AppliesForContracts key={apply.id_aplicacao} contract={contract} apply={apply} userId={parseInt(params.id)}>
+                                        <div className="flex gap-5">
+                                          {apply.valorproposta ? (
+                                            <p>
+                                              <strong>Valor proposta:</strong> {apply.valorproposta}
+                                            </p>
+                                          ) : (
+                                            <p>
+                                              <strong>Valor:</strong> {contract.valor}
+                                            </p>
+                                          )}
+                                          <p>
+                                            <strong>Artista:</strong> {user.nome}
+                                          </p>
+                                        </div>
+                                      </AppliesForContracts>
+                                    );
+                                  })
+                                )}
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <div key={`no-applies-${contract.id_contrato}`}>
+                              <p>You didn't invite any artists</p>
+                            </div>
+                          );
+                        })}
+                    </div> */}
                   </div>
                 ))
                   :
