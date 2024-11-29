@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createEvento, getEventosByEstabelecimento, updateEvento, deleteEvento, getEventoById } from '@/lib/evento'
 
+async function getCurrentUserId() {
+  return Number(process.env.USER_ID) // Obtém o ID do usuário atual
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -37,12 +41,13 @@ export async function GET(request: Request) {
 export async function PUT(request: Request) {
   const { searchParams } = new URL(request.url)
   const id = searchParams.get('id')
+  const userId = await getCurrentUserId() // Obtém o ID do usuário atual
   if (!id) {
     return NextResponse.json({ error: 'ID is required' }, { status: 400 })
   }
   try {
     const body = await request.json()
-    const event = await updateEvento(parseInt(id), body)
+    const event = await updateEvento(parseInt(id), body, userId)
     return NextResponse.json(event)
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update event' }, { status: 500 })

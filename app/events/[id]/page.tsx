@@ -1,12 +1,50 @@
-import { getEventoById } from '@/lib/evento'
-import { getEstabelecimentoById } from '@/lib/estabelecimento'
+"use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
+import { getEstabelecimentoById } from "@/lib/estabelecimento"
+import { getEventoById } from "@/lib/evento"
+
+// Função para buscar o evento
+async function fetchEventData(id: string) {
+  const response = await fetch(`/api/events/${id}`)
+  if (!response.ok) {
+    throw new Error('Failed to fetch event data')
+  }
+  return response.json()
+}
+
+// Função para excluir o evento
+async function deleteEvent(id: string) {
+  const response = await fetch(`/api/events/${id}`, {
+    method: 'DELETE',
+  })
+
+  if (!response.ok) {
+    const result = await response.json()
+    throw new Error(result.error || 'Failed to delete event')
+  }
+
+  return response.json()  // Retorna a mensagem de sucesso
+}
+
+async function getEvent(id: string) {
+  const response = await fetch(`/api/events/${id}`, {
+    method: 'GET',
+  })
+
+  if (!response.ok) {
+    const result = await response.json()
+    throw new Error(result.error || 'Failed to get event')
+  }
+
+  return response.json()
+}
 
 export default async function EventDetailPage({ params }: { params: { id: string } }) {
-  const event = await getEventoById(parseInt(params.id))
-  const establishment = event?.id_estabelecimento ? await getEstabelecimentoById(event.id_estabelecimento) : null
+  let establishment
+
+  const event = await getEvent(params.id)
 
   if (!event) {
     return <div>Event not found</div>
@@ -31,9 +69,16 @@ export default async function EventDetailPage({ params }: { params: { id: string
         <Link href={`/events/${params.id}/edit`}>
           <Button variant="outline">Edit</Button>
         </Link>
-        <Button variant="destructive">Cancel Event</Button>
+        <Button variant="destructive" onClick={async () => {
+          try {
+            // Tenta excluir o evento
+            const result = await deleteEvent(params.id)
+            window.location.href = '/events'  // Redireciona para a lista de eventos
+          } catch (error) {
+            console.error('Error deleting event:', error)
+          }
+        }}>Cancel Event</Button>
       </div>
     </div>
   )
 }
-

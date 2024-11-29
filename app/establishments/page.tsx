@@ -1,15 +1,78 @@
+"use client"  // Garantindo que este componente será executado no lado do cliente
+
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { getEstabelecimentoByProprietarioId } from '@/lib/estabelecimento'
+import { useState, useEffect } from 'react'
 
 async function getCurrentUserId() {
     return Number(process.env.USER_ID)
 }
 
-export default async function EstablishmentsPage() {
-    const userId = await getCurrentUserId()
-    const establishments = await getEstabelecimentoByProprietarioId(userId)
+async function deleteEstablishment(id: string) {
+    const response = await fetch(`/api/establishments/${id}`, {
+        method: 'DELETE',
+    })
+
+    if (!response.ok) {
+        const result = await response.json()
+        throw new Error(result.error || 'Failed to delete establishment')
+    }
+
+    return response.json()  // Retorna a mensagem de sucesso
+}
+
+async function getEstabelecimentoByProprietarioId(id: number) {
+    const response = await fetch(`/api/establishments?userId=${id}`, {
+        method: 'GET',
+    })
+
+    if (!response.ok) {
+        const result = await response.json()
+        throw new Error(result.error || 'Failed to get establishment')
+    }
+
+    return response.json()  // Retorna a lista de estabelecimentos
+}
+
+export default function EstablishmentsPage() {
+    const [establishments, setEstablishments] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const userId = await getCurrentUserId()
+            try {
+                const data = await getEstabelecimentoByProprietarioId(userId)
+                setEstablishments(data)
+                setLoading(false)
+            } catch (error) {
+                setError(error.message)
+                setLoading(false)
+            }
+        }
+
+        fetchData()
+    }, [])  // A função será executada uma vez, quando o componente for montado
+
+    const handleDelete = async (id: string) => {
+        try {
+            // Tenta excluir o estabelecimento
+            const result = await deleteEstablishment(id)
+
+            // Atualiza o estado para refletir a exclusão
+            setEstablishments(prevEstablishments =>
+                prevEstablishments.filter(establishment => establishment.id_estabelecimento !== id)
+            )
+        } catch (error) {
+            console.error('Error deleting establishment:', error)
+        }
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>
+    }
 
     return (
         <div className="space-y-6">
@@ -33,9 +96,9 @@ export default async function EstablishmentsPage() {
                                 <Link href={`/establishments/${establishment.id_estabelecimento}/edit`}>
                                     <Button variant="outline">Edit</Button>
                                 </Link>
-                                <Link href={`/establishments/${establishment.id_estabelecimento}/delete`}>
-                                    <Button variant="destructive">Delete</Button>
-                                </Link>
+                                <Button variant="destructive" onClick={() => handleDelete(establishment.id_estabelecimento)}>
+                                    Delete
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
@@ -44,4 +107,3 @@ export default async function EstablishmentsPage() {
         </div>
     )
 }
-
